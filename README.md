@@ -1,5 +1,5 @@
 # Thanatos
-Thanatos - a 2D Platformer Game made in Unity
+2D Platformer Game made in Unity
 
 More information about the game @ https://www.patreon.com/sousadev
 
