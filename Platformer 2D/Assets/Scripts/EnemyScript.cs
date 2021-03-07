@@ -7,12 +7,11 @@ public class EnemyScript : MonoBehaviour
 #region Variables
     public int maxHealth = 100;
     int currentHealth;
-    public Transform rayCast;
-    public LayerMask raycastMask;
-    public float rayCastLength;
     public float attackDistance;
     public float moveSpeed;
     public float timer; //Timer for cooldown between attacks
+    public Vector3 characterScale;
+    public Transform Player;
     private RaycastHit2D hit;
     private GameObject target;
     private Animator anim;
@@ -26,6 +25,7 @@ public class EnemyScript : MonoBehaviour
     void Awake(){
         intTimer = timer;
         anim = GetComponent<Animator>();
+        characterScale = transform.localScale;
     }
 
     // Start is called before the first frame update
@@ -35,20 +35,19 @@ public class EnemyScript : MonoBehaviour
     }
 
     void Update(){
-        if (inRange){
-            hit = Physics2D.Raycast(rayCast.position, Vector2.left, rayCastLength, raycastMask);
-            RaycastDebugger();
-        }
-
-        if (hit.collider != null) Debug.Log("hit not null");
-        //When Player is detected
-        if(hit.collider != null)
-            EnemyLogic();
-        else if (hit.collider == null)
-            inRange = false;
-        if (!inRange){
-            anim.SetBool("canWalk", false);
-            StopAttack();
+        if (currentHealth > 0){
+            if (Player.position.x > transform.position.x)
+                characterScale.x = Mathf.Abs(characterScale.x);
+            else
+                characterScale.x = -1 * Mathf.Abs(characterScale.x);
+            transform.localScale = characterScale;
+            if (inRange){
+                EnemyLogic();
+            }
+            else{
+                anim.SetBool("canWalk", false);
+                StopAttack();
+            }
         }
     }
 
@@ -95,6 +94,12 @@ public class EnemyScript : MonoBehaviour
             inRange = true;
         }
     }
+    void OnTriggerExit2D(Collider2D trig){
+        if (trig.gameObject.tag == "Player"){
+            target = trig.gameObject;
+            inRange = false;
+        }
+    }
 
     public void TakeDamage(int damage){
         currentHealth -= damage;
@@ -106,16 +111,7 @@ public class EnemyScript : MonoBehaviour
     }
 
     void Die(){
-        Debug.Log("Enemy Died");
-    }
-
-    void RaycastDebugger(){
-        if (distance > attackDistance){
-            Debug.DrawRay(rayCast.position, Vector2.left * rayCastLength, Color.red);
-        }
-        else if(attackDistance > distance){
-            Debug.DrawRay(rayCast.position, Vector2.left * rayCastLength, Color.green);
-        }
+        anim.SetTrigger("die");
     }
     void Cooldown(){
         timer -= Time.deltaTime;

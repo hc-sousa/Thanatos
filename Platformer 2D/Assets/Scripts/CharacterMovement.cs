@@ -179,14 +179,13 @@ public class CharacterMovement : MonoBehaviour
     }
 
     void attack(){
-        //Detect enemies in range of attack
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
         //Damage Enemies
-        foreach(Collider2D enemy in hitEnemies)
-        {
-            enemy.GetComponent<EnemyScript>().TakeDamage(attackDamage);
-        }
+            foreach(Collider2D enemy in hitEnemies)
+            {
+                enemy.GetComponent<EnemyScript>().TakeDamage(attackDamage);
+            }
     }
 
     void createDust(){
