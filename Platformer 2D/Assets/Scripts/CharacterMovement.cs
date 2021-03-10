@@ -126,7 +126,7 @@ public class CharacterMovement : MonoBehaviour
 
         #region COMBAT
         if(Input.GetKeyDown(KeyCode.F)){
-            if (Mathf.Abs(rigidbody.velocity.y) < 0.001f)
+            if (isTouchingGround())
                 anim.SetTrigger("attack");
             else
                 anim.SetTrigger("jumpAttack");
