@@ -42,6 +42,11 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] public LayerMask enemyLayers;
     [SerializeField] public int attackDamage = 40;
 
+    [Header("For skills")]
+    [SerializeField] public GameObject wallForSkill;
+    [SerializeField] public GameObject shuriken;
+    [SerializeField] public Rigidbody2D rbShuriken;
+
     private void Start()
     {
         anim = GetComponent<Animator>();
@@ -137,6 +142,32 @@ public class CharacterMovement : MonoBehaviour
         }
         if(Input.GetKey(KeyCode.H)){
             anim.SetTrigger("hurt");
+        }
+        #endregion
+
+        #region SKILLS
+        //Stone
+        if(Input.GetKeyDown(KeyCode.Q) && isTouchingGround()){
+            anim.SetTrigger("wallSkill");
+            GameObject newStone = Instantiate(wallForSkill);
+            float offsetX;
+            if (transform.localScale.x < 0) offsetX = -1.5f;
+            else offsetX = 1.5f;
+            newStone.transform.position = transform.position + new Vector3(offsetX, 1.5f ,0);
+            newStone.SetActive(true);
+            Destroy(newStone, 5);
+        }
+
+        //Shuriken
+        if(Input.GetKeyDown(KeyCode.R)){
+            anim.SetTrigger("shuriken");
+            GameObject newShuriken = Instantiate(shuriken);
+            float offsetX;
+            if (transform.localScale.x < 0) offsetX = -1f;
+            else offsetX = 1f;
+            newShuriken.transform.position = transform.position + new Vector3(offsetX, 0 ,0);
+            newShuriken.SetActive(true);
+            Destroy(newShuriken, 10);
         }
         #endregion
 
