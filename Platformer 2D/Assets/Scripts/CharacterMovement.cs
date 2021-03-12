@@ -45,7 +45,7 @@ public class CharacterMovement : MonoBehaviour
     [Header("For skills")]
     [SerializeField] public GameObject wallForSkill;
     [SerializeField] public GameObject shuriken;
-    [SerializeField] public Rigidbody2D rbShuriken;
+    [SerializeField] public float throwForce;
 
     private void Start()
     {
@@ -165,8 +165,9 @@ public class CharacterMovement : MonoBehaviour
             float offsetX;
             if (transform.localScale.x < 0) offsetX = -1f;
             else offsetX = 1f;
-            newShuriken.transform.position = transform.position + new Vector3(offsetX, 0 ,0);
+            newShuriken.transform.position = transform.position + new Vector3(offsetX, 0 , 0);
             newShuriken.SetActive(true);
+            newShuriken.GetComponent<Rigidbody2D>().AddForce(new Vector2(offsetX * throwForce, 0), ForceMode2D.Impulse);
             Destroy(newShuriken, 10);
         }
         #endregion
@@ -213,10 +214,10 @@ public class CharacterMovement : MonoBehaviour
         Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
 
         //Damage Enemies
-            foreach(Collider2D enemy in hitEnemies)
-            {
-                enemy.GetComponent<EnemyScript>().TakeDamage(attackDamage);
-            }
+        foreach(Collider2D enemy in hitEnemies)
+        {
+            enemy.GetComponent<EnemyScript>().TakeDamage(attackDamage);
+        }
     }
 
     void createDust(){
