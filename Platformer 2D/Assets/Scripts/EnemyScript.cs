@@ -80,10 +80,10 @@ public class EnemyScript : MonoBehaviour
         attackMode = true; // To check if Enemy can still attack or not
         anim.SetBool("attack", true);
         anim.SetBool("canWalk", false);
+        TriggerCooling();
     }
 
     void StopAttack(){
-        cooling = false;
         attackMode = false;
         anim.SetBool("attack", false);
     }
@@ -116,12 +116,13 @@ public class EnemyScript : MonoBehaviour
     void Cooldown(){
         timer -= Time.deltaTime;
 
-        if (timer <= 0 && cooling && attackMode){
+        if (timer <= 0 && cooling){
             cooling = false;
             timer = intTimer;
         }
     }
     public void TriggerCooling(){
         cooling = true;
+        attackMode = false;
     }
 }

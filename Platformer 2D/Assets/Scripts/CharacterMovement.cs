@@ -32,20 +32,26 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] public float dashSpeed;
     [SerializeField] public float startDashTime;
     [SerializeField] private float dashTime;
-    [SerializeField] private float dashCooldown;
+    [SerializeField] public float dashCooldown;
     [SerializeField] private int dashDirection;
     [SerializeField] private bool used;
     
     [Header("For Combat")]
+    [SerializeField] private float maxHP;
+    [SerializeField] public float HP;
     [SerializeField] public Transform attackPoint;
     [SerializeField] public float attackRange =  0.7f;
     [SerializeField] public LayerMask enemyLayers;
     [SerializeField] public int attackDamage = 40;
 
-    [Header("For skills")]
+    [Header("For Skills")]
     [SerializeField] public GameObject wallForSkill;
     [SerializeField] public GameObject shuriken;
     [SerializeField] public float throwForce;
+    [SerializeField] Transform StoneWallGroundCheck;
+    [SerializeField] private float wallCooldown;
+    [SerializeField] public float startWallTime;
+    [SerializeField] private bool wallUsed;
 
     private void Start()
     {
@@ -53,9 +59,12 @@ public class CharacterMovement : MonoBehaviour
         rigidbody = GetComponent<Rigidbody2D>();
         characterScale = transform.localScale;
         dashTime = startDashTime;
+        wallCooldown = startWallTime;
         dashDirection = 1;
-        dashCooldown = 3;
         used = false;
+        wallUsed = false;
+        maxHP = 100;
+        HP = maxHP;
         wallJumpAngle.Normalize();
     }
 
@@ -64,7 +73,7 @@ public class CharacterMovement : MonoBehaviour
         var movement = Input.GetAxis("Horizontal");
 
         #region BASICMOVEMENT
-        if(Input.GetKey(KeyCode.Space) && isTouchingGround() && Mathf.Abs(rigidbody.velocity.y) < 0.001f){
+        if((Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.W)) && isTouchingGround() && Mathf.Abs(rigidbody.velocity.y) < 0.001f){
             jump();
         }
         if(Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D)){
@@ -147,17 +156,27 @@ public class CharacterMovement : MonoBehaviour
 
         #region SKILLS
         //Stone
-        if(Input.GetKeyDown(KeyCode.Q) && isTouchingGround()){
-            anim.SetTrigger("wallSkill");
-            GameObject newStone = Instantiate(wallForSkill);
+        if(Input.GetKeyDown(KeyCode.Q) && isTouchingGround() && !wallUsed){
             float offsetX;
             if (transform.localScale.x < 0) offsetX = -1.5f;
             else offsetX = 1.5f;
-            newStone.transform.position = transform.position + new Vector3(offsetX, 1.5f ,0);
-            newStone.SetActive(true);
-            Destroy(newStone, 5);
+            StoneWallGroundCheck.transform.position = transform.position + new Vector3(offsetX, -1.8f ,0);
+            if (StoneWallIsTouchingGround()){
+                GameObject newStone = Instantiate(wallForSkill);
+                anim.SetTrigger("wallSkill");
+                newStone.transform.position = transform.position + new Vector3(offsetX, 1.5f ,0);
+                newStone.SetActive(true);
+                wallUsed = true;
+                Destroy(newStone, 5);
+            }
         }
-
+        if (wallUsed){
+            wallCooldown -= Time.deltaTime;
+            if (wallCooldown <= 0){
+                wallUsed = false;
+                wallCooldown = startWallTime;
+            } 
+        }
         //Shuriken
         if(Input.GetKeyDown(KeyCode.R)){
             anim.SetTrigger("shuriken");
@@ -185,7 +204,7 @@ public class CharacterMovement : MonoBehaviour
         }
         if (isWallSliding && !isTouchingGround())
             rigidbody.velocity = new Vector2(rigidbody.velocity.x, wallSlidingSpeed);
-        if (isWallSliding && Input.GetKey(KeyCode.Space))
+        if (isWallSliding && (Input.GetKey(KeyCode.Space) || Input.GetKey(KeyCode.W)))
             jump();
         #endregion
         
@@ -226,6 +245,10 @@ public class CharacterMovement : MonoBehaviour
 
     bool isTouchingGround(){
         return Physics2D.OverlapBox(groundCheck.position, groundCheckSize, 0, groundLayer);
+    }
+
+    bool StoneWallIsTouchingGround(){
+        return Physics2D.OverlapBox(StoneWallGroundCheck.position, groundCheckSize, 0, groundLayer);
     }
 
     bool isTouchingWall(){
