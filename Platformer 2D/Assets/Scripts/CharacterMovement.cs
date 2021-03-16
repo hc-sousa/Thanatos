@@ -52,6 +52,7 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] private float wallCooldown;
     [SerializeField] public float startWallTime;
     [SerializeField] private bool wallUsed;
+    [SerializeField] private bool canUseShuriken = true;
 
     private void Start()
     {
@@ -179,6 +180,8 @@ public class CharacterMovement : MonoBehaviour
         }
         //Shuriken
         if(Input.GetKeyDown(KeyCode.R)){
+
+        if (canUseShuriken){
             anim.SetTrigger("shuriken");
             GameObject newShuriken = Instantiate(shuriken);
             float offsetX;
@@ -187,7 +190,8 @@ public class CharacterMovement : MonoBehaviour
             newShuriken.transform.position = transform.position + new Vector3(offsetX, 0 , 0);
             newShuriken.SetActive(true);
             newShuriken.GetComponent<Rigidbody2D>().AddForce(new Vector2(offsetX * throwForce, 0), ForceMode2D.Impulse);
-            Destroy(newShuriken, 10);
+            canUseShuriken = false;
+        }
         }
         #endregion
 
@@ -235,7 +239,8 @@ public class CharacterMovement : MonoBehaviour
         //Damage Enemies
         foreach(Collider2D enemy in hitEnemies)
         {
-            enemy.GetComponent<EnemyScript>().TakeDamage(attackDamage);
+            if (enemy.GetComponent<EnemyScript>().currentHealth > 0)
+                enemy.GetComponent<EnemyScript>().TakeDamage(attackDamage);
         }
     }
 
@@ -253,5 +258,8 @@ public class CharacterMovement : MonoBehaviour
 
     bool isTouchingWall(){
         return Physics2D.OverlapBox(wallCheck.position, wallCheckSize, 0, wallLayer);
+    }
+    public void CanUseShuriken(bool canHe){
+        canUseShuriken = canHe;
     }
 }

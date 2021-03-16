@@ -6,7 +6,7 @@ public class EnemyScript : MonoBehaviour
 {
 #region Variables
     public int maxHealth = 100;
-    int currentHealth;
+    public int currentHealth;
     public float attackDistance;
     public float moveSpeed;
     public float timer; //Timer for cooldown between attacks
@@ -46,7 +46,6 @@ public class EnemyScript : MonoBehaviour
             }
             else{
                 anim.SetBool("canWalk", false);
-                StopAttack();
             }
         }
     }
@@ -56,36 +55,25 @@ public class EnemyScript : MonoBehaviour
         
         if (distance > attackDistance){
             Move();
-            StopAttack();
         }
         else if (attackDistance >= distance && !cooling){
             Attack();
         }
         if (cooling){
             Cooldown();
-            anim.SetBool("attack", false);
         }
     }
 
     void Move(){
         anim.SetBool("canWalk", true);
-        if (!anim.GetCurrentAnimatorStateInfo(0).IsName("attack")){
-            Vector2 targetPosition = new Vector2(target.transform.position.x, transform.position.y);
-            transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        }
+        Vector2 targetPosition = new Vector2(target.transform.position.x, transform.position.y);
+        transform.position = Vector2.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
     }
 
     void Attack(){
-        timer = intTimer; // Reset Timer when Player enter Attack Range
-        attackMode = true; // To check if Enemy can still attack or not
-        anim.SetBool("attack", true);
+        anim.SetTrigger("attack");
         anim.SetBool("canWalk", false);
         TriggerCooling();
-    }
-
-    void StopAttack(){
-        attackMode = false;
-        anim.SetBool("attack", false);
     }
 
     void OnTriggerEnter2D(Collider2D trig){
@@ -123,6 +111,5 @@ public class EnemyScript : MonoBehaviour
     }
     public void TriggerCooling(){
         cooling = true;
-        attackMode = false;
     }
 }
