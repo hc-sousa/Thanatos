@@ -1,9 +1,9 @@
 # Thanatos
-2D Platformer Game made in Unity
+2D Platformer Game made in Unity --in development--
 
 More information about the game @ https://www.patreon.com/sousadev
 
-Video about the project https://www.youtube.com/watch?v=mbMGk-JimcQ
+Videos about the project https://www.youtube.com/watch?v=mbMGk-JimcQ&list=PLeXmWJfNm5_KzzQQpURcwSw0HQhMJULBL
 
 https://sousadev.com
 
