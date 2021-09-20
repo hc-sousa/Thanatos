@@ -8,6 +8,10 @@ public class EnemyScript : MonoBehaviour
     public int maxHealth = 100;
     public int currentHealth;
     public float attackDistance;
+    public Transform attackPoint;
+    public float attackRange =  0.7f;
+    public float attackDamage = 20;
+    public LayerMask enemyLayers;
     public float moveSpeed;
     public float timer; //Timer for cooldown between attacks
     public Vector3 characterScale;
@@ -73,6 +77,14 @@ public class EnemyScript : MonoBehaviour
     void Attack(){
         anim.SetTrigger("attack");
         anim.SetBool("canWalk", false);
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+
+        //Damage Enemies
+        foreach(Collider2D enemy in hitEnemies)
+        {
+         if(enemy.GetComponent<CharacterMovement>().HP > 0)
+            enemy.GetComponent<CharacterMovement>().takeDamage(attackDamage);
+        }
         TriggerCooling();
     }
 
